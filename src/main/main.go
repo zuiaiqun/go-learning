@@ -3,5 +3,6 @@ package main
 import "test"
 
 func main() {
-	test.TestQuickSort()
+	//test.TestQuickSort()
+	test.TestList()
 }
