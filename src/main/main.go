@@ -4,5 +4,6 @@ import "test"
 
 func main() {
 	//test.TestQuickSort()
-	test.TestList()
+	//test.TestList()
+	test.TestInterface()
 }
