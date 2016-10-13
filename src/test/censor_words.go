@@ -3,6 +3,7 @@
 假设树高为len(a) = 关键字最大长度，最大为10
 message 的长度为len(b)
 最坏情况时间复杂度=10 * len(b)
+内存占用6m左右
 */
 
 package test
@@ -29,12 +30,13 @@ type Darts struct {
 	KeyCount int
 }
 
+//后面会被回收掉
 type dartsBuild struct {
 	darts        Darts
 	size         int
 	key          [][]rune
 	nextCheckPos int
-	used         []bool
+	used         []int
 }
 
 func max(a, b int) int {
@@ -65,7 +67,7 @@ func (d *dartsBuild) resize(newSize int) {
 	if newSize > cap(d.darts.Base) {
 		d.darts.Base = append(d.darts.Base, make([]int, (newSize-len(d.darts.Base)))...)
 		d.darts.Check = append(d.darts.Check, make([]int, (newSize-len(d.darts.Check)))...)
-		d.used = append(d.used, make([]bool, (newSize-len(d.used)))...)
+		d.used = append(d.used, make([]int, (newSize-len(d.used)))...)
 	} else {
 		d.darts.Base = d.darts.Base[:newSize]
 		d.darts.Check = d.darts.Check[:newSize]
@@ -158,7 +160,7 @@ func (d *dartsBuild) insert(siblings []node) int {
 			d.resize(begin + int(siblings[len(siblings)-1].code) + 400)
 		}
 
-		if d.used[begin] {
+		if d.used[begin] == 1 {
 			continue
 		}
 
@@ -177,7 +179,7 @@ func (d *dartsBuild) insert(siblings []node) int {
 	if float32(nonZeroNum)/float32(pos-d.nextCheckPos+1) >= 0.95 {
 		d.nextCheckPos = pos
 	}
-	d.used[begin] = true
+	d.used[begin] = 1
 	d.size = max(d.size, begin+int(siblings[len(siblings)-1].code)+1)
 
 	for i := 0; i < len(siblings); i++ {
@@ -280,6 +282,7 @@ func Import(inFile, outFile string) (Darts, error) {
 	// 输入文件
 	unifile, erri := os.Open(inFile)
 	if erri != nil {
+		fmt.Println("no file")
 		return Darts{}, erri
 	}
 	defer unifile.Close()
@@ -292,7 +295,7 @@ func Import(inFile, outFile string) (Darts, error) {
 	defer ofile.Close()
 
 	// 读取文件，对所有key进行排序
-	dartsKeys := make(dartsKeySlice, 0, 100000)
+	dartsKeys := make(dartsKeySlice, 0, 130000)
 	uniLineReader := bufio.NewReaderSize(unifile, 400)
 	line, _, bufErr := uniLineReader.ReadLine()
 	for nil == bufErr {
@@ -381,6 +384,7 @@ func ImportFromJson(jsonStr string) (Darts, error) {
 
 /*
 从已有文件直接加载到内存
+rebuild
 */
 func Load(filename string) (Darts, error) {
 	var dict Darts
@@ -405,7 +409,8 @@ func Dumps(d Darts) {
 }
 
 func Init() (Darts, error) {
-	jsonStr := GetJsonCensorWords()
-	d, err := ImportFromJson(jsonStr)
+	// jsonStr := GetJsonCensorWords()
+	// d, err := ImportFromJson(jsonStr)
+	d, err := Import("./censor-words.txt", "./censor-words.lib")
 	return d, err
 }
