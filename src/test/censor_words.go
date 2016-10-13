@@ -1,9 +1,9 @@
 /*
-双数组实现的trie树, 查询时间只与输入的字符串相关
+双数组实现的trie树, 离线算法，查询时间只与输入的字符串相关
 假设树高为len(a) = 关键字最大长度，最大为10
 message 的长度为len(b)
 最坏情况时间复杂度=10 * len(b)
-内存占用6m左右
+内存占用5m左右
 */
 
 package test
@@ -411,6 +411,7 @@ func Dumps(d Darts) {
 func Init() (Darts, error) {
 	// jsonStr := GetJsonCensorWords()
 	// d, err := ImportFromJson(jsonStr)
-	d, err := Import("./censor-words.txt", "./censor-words.lib")
+	//d, err := Import("./censor-words.txt", "./censor-words.lib")
+	d, err := Load("./censor-words.lib")
 	return d, err
 }

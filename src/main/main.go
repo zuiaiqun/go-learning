@@ -14,7 +14,7 @@ func main() {
 
 	d, err := test.Init()
 	if err == nil {
-		isFound := d.Search("af\"afaabb")
+		isFound := d.Search("af\"六1四1111运动")
 		if isFound {
 			fmt.Println("is_found")
 		} else {
